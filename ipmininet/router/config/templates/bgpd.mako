@@ -17,6 +17,10 @@ router bgp ${node.bgpd.asn}
     neighbor ${n.peer} remote-as ${n.asn}
     neighbor ${n.peer} port ${n.port}
     neighbor ${n.peer} description ${n.description}
+    neighbor ${n.peer} advertisement-interval ${node.bgpd.advertisement_timer}
+    % if n.peer in node.bgpd.communities.keys():
+    neighbor ${n.peer} route-map ${n.node}_RMAP out
+    % endif
     % if n.ebgp_multihop:
     neighbor ${n.peer} ebgp-multihop
     % endif
@@ -45,3 +49,9 @@ router bgp ${node.bgpd.asn}
 % endfor
 <%block name="router"/>
 !
+% for n in node.bgpd.neighbors:
+% if n.peer in node.bgpd.communities.keys():
+route-map ${n.node}_RMAP permit 10
+ set community ${node.bgpd.communities[n.peer]}
+% endif
+% endfor

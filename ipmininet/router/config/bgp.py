@@ -70,6 +70,22 @@ def ebgp_session(topo, a, b):
     topo.linkInfo(a, b)['igp_passive'] = True
 
 
+def peer_connection(topo, as1, as2):
+    set_community(topo, as1, as2.asn, str(as1.asn) + ':0')
+    set_community(topo, as2, as1.asn, str(as2.asn) + ':0')
+
+
+def provider_customer_connection(topo, provider, customer):
+    set_community(topo, provider, customer.asn, str(provider.asn) + ':1')
+    set_community(topo, customer, provider.asn, str(customer.asn) + ':2')
+
+
+def set_community(topo, local_as, remote_as, community):
+    for r in local_as.nodes:
+        communities = topo.getNodeInfo(r, 'bgp_communities', dict)
+        communities[remote_as] = community
+
+
 class BGP(QuaggaDaemon):
     """This class provides the configuration skeletons for BGP routers."""
     NAME = 'bgpd'
@@ -92,11 +108,14 @@ class BGP(QuaggaDaemon):
         cfg.neighbors = self._build_neighbors()
         cfg.address_families = self._address_families(
             self.options.address_families, cfg.neighbors)
+        cfg.advertisement_timer = self.options.advertisement_timer
+        cfg.communities = self._build_communities(cfg.neighbors)
         return cfg
 
     def set_defaults(self, defaults):
         """:param address_families: The set of AddressFamily to use"""
         defaults.address_families = []
+        defaults.advertisement_timer = 10
         super(BGP, self).set_defaults(defaults)
 
     def _build_neighbors(self):
@@ -111,6 +130,9 @@ class BGP(QuaggaDaemon):
             a.neighbors.extend(nei)
         return af
 
+    def _build_communities(self, neighbors):
+        com = self._node.get('bgp_communities', {}).iteritems()
+        return {n.peer:v for n in neighbors for k, v in com if n.asn == k}
 
 class AddressFamily(object):
     """An address family that is exchanged through BGP"""
@@ -139,6 +161,7 @@ class Peer(object):
     def __init__(self, base, node):
         """:param base: The base router that has this peer
         :param node: The actual peer"""
+        self.node = node
         self.peer, other = self._find_peer_address(base, node)
         self.asn = other.asn
         try:
