@@ -121,8 +121,7 @@ class BGP(QuaggaDaemon):
         return af
 
     def _build_communities(self, neighbors):
-        com = self._node.get('bgp_communities', {}).iteritems()
-        return {n.peer:v for n in neighbors for k, v in com if n.asn == k}
+        return self._node.get('bgp_communities', {})
 
 class AddressFamily(object):
     """An address family that is exchanged through BGP"""
