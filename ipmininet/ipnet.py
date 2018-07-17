@@ -71,6 +71,7 @@ class IPNet(Mininet):
         self.igp_area = igp_area
         self.allocate_IPs = allocate_IPs
         self.physical_interface = {}  # itf: node
+        self.is_running = False
         super(IPNet, self).__init__(ipBase=ipBase, switch=switch, link=link,
                                     intf=intf, controller=controller,
                                     *args, **kwargs)
@@ -204,6 +205,7 @@ class IPNet(Mininet):
                     break
             if not default:
                 log.info('skipping %s , ' % h.name)
+        self.is_running = True
         log.info('\n')
 
     def stop(self):
@@ -213,6 +215,7 @@ class IPNet(Mininet):
             router.terminate()
         log.info('\n')
         super(IPNet, self).stop()
+        self.is_running = False
 
     def build(self):
         super(IPNet, self).build()

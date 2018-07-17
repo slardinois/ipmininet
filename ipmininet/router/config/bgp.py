@@ -70,16 +70,6 @@ def ebgp_session(topo, a, b):
     topo.linkInfo(a, b)['igp_passive'] = True
 
 
-def peer_connection(topo, as1, as2):
-    set_community(topo, as1, as2.asn, str(as1.asn) + ':0')
-    set_community(topo, as2, as1.asn, str(as2.asn) + ':0')
-
-
-def provider_customer_connection(topo, provider, customer):
-    set_community(topo, provider, customer.asn, str(provider.asn) + ':1')
-    set_community(topo, customer, provider.asn, str(customer.asn) + ':2')
-
-
 def set_community(topo, local_as, remote_as, community):
     for r in local_as.nodes:
         communities = topo.getNodeInfo(r, 'bgp_communities', dict)
