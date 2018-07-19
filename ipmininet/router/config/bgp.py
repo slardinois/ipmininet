@@ -99,13 +99,13 @@ class BGP(QuaggaDaemon):
         cfg.address_families = self._address_families(
             self.options.address_families, cfg.neighbors)
         cfg.advertisement_timer = self.options.advertisement_timer
+        cfg.hold_time = self.options.hold_time
         cfg.communities = self._build_communities(cfg.neighbors)
         return cfg
 
     def set_defaults(self, defaults):
         """:param address_families: The set of AddressFamily to use"""
         defaults.address_families = []
-        defaults.advertisement_timer = 10
         super(BGP, self).set_defaults(defaults)
 
     def _build_neighbors(self):
