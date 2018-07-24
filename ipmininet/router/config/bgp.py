@@ -100,7 +100,7 @@ class BGP(QuaggaDaemon):
             self.options.address_families, cfg.neighbors)
         cfg.advertisement_timer = self.options.advertisement_timer
         cfg.hold_time = self.options.hold_time
-        cfg.communities = self._build_communities(cfg.neighbors)
+        cfg.communities = self._node.get('bgp_communities', {})
         return cfg
 
     def set_defaults(self, defaults):
@@ -119,9 +119,7 @@ class BGP(QuaggaDaemon):
         for a in af:
             a.neighbors.extend(nei)
         return af
-
-    def _build_communities(self, neighbors):
-        return self._node.get('bgp_communities', {})
+        
 
 class AddressFamily(object):
     """An address family that is exchanged through BGP"""
