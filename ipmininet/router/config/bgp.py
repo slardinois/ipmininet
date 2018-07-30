@@ -71,6 +71,14 @@ def ebgp_session(topo, a, b):
 
 
 def set_community(topo, local_as, remote_as, community):
+    """Set a local community on the routes advertised by remote_as.
+    
+    :param local_as: The as that will set the local community
+    :param remote_as: The as which advertised the route which will have a community
+    :param community: The local community to be set.
+                      asn:1337 means remote_as is a peer
+                      asn:1336 means remote_as is a client
+                      asn:1338 means remote_as is a provider"""
     for r in local_as.nodes:
         communities = topo.getNodeInfo(r, 'bgp_communities', dict)
         communities[remote_as] = community
